@@ -1,7 +1,5 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/data/mappers/user_mapper.dart';
-import 'package:embutido_tracker/domain/entity/user.dart';
-import 'package:embutido_tracker/domain/repositories/auth_repository.dart';
+import 'package:embutido_tracker/domain/sources/auth_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseAuthSource implements AuthService {
@@ -10,19 +8,21 @@ class SupabaseAuthSource implements AuthService {
   SupabaseAuthSource(this._client);
 
   @override
-  Future<User?> signIn({
-    required String email,
-    required String password,
-  }) async {
+  String? get currentUserId => _client.auth.currentUser?.id;
+
+  @override
+  Stream<String?> get currentUserIdStream =>
+      _client.auth.onAuthStateChange.map((event) => event.session?.user.id);
+
+  @override
+  Future<void> signIn({required String email, required String password}) async {
     try {
       final response = await _client.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
-      if (response.session != null && response.user != null) {
-        return User(id: response.user!.id, email: email);
-      } else {
+      if (response.session == null || response.user == null) {
         throw AuthException("No session/user returned");
       }
     } on AuthException catch (e) {
@@ -38,19 +38,14 @@ class SupabaseAuthSource implements AuthService {
   Future<void> signOut() async => await _client.auth.signOut();
 
   @override
-  Future<User?> signUp({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     try {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
       );
 
-      if (response.session != null && response.user != null) {
-        return User(id: response.user!.id, email: email);
-      } else {
+      if (response.session == null || response.user == null) {
         throw AuthException("No session/user returned");
       }
     } on AuthException catch (e) {
@@ -61,12 +56,4 @@ class SupabaseAuthSource implements AuthService {
       throw Exception("Unexpected error: $e");
     }
   }
-
-  @override
-  Stream<User?> get onAuthStateChanged => _client.auth.onAuthStateChange.map(
-    (event) =>
-        event.session != null
-            ? mapSupabaseUserToDomain(event.session!.user)
-            : null,
-  );
 }

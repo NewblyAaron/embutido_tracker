@@ -1,8 +1,8 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/di/providers.dart';
-import 'package:embutido_tracker/domain/repositories/auth_repository.dart';
+import 'package:embutido_tracker/domain/repositories/user_repository.dart';
+import 'package:embutido_tracker/ui/home/home_screen.dart';
 import 'package:embutido_tracker/ui/login/login_screen.dart';
-import 'package:embutido_tracker/ui/map/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -36,10 +36,12 @@ class EmbutidoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: StreamBuilder(
-        stream: context.read<AuthService>().onAuthStateChanged,
+        stream: context.read<UserRepository>().userStream,
         builder:
             (context, snapshot) =>
-                snapshot.data != null ? MapScreen() : LoginScreen(),
+                snapshot.data != null
+                    ? Provider.value(value: snapshot.data!, child: HomeScreen())
+                    : LoginScreen(),
       ),
     );
   }

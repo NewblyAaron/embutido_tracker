@@ -6,6 +6,13 @@ class User {
 
   User({required this.id, required this.email, this.userName, this.avatarUrl});
 
+  User copyWith({String? userName, String? avatarUrl}) => User(
+    id: id,
+    email: email,
+    userName: userName ?? this.userName,
+    avatarUrl: avatarUrl ?? this.avatarUrl,
+  );
+
   @override
   String toString() => "$userName [$id]";
 }

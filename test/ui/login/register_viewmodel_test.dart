@@ -13,9 +13,8 @@ void main() {
 
   setUp(() {
     mockAuth = MockAuthService();
-    mockLogger = MockLoggerService();
 
-    LoggerAccess.overrideLogger(mockLogger);
+    LoggerAccess.init(loggerService: MockLoggerService());
     viewModel = RegisterViewModel(auth: mockAuth);
   });
 

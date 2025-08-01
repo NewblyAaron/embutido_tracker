@@ -20,7 +20,7 @@ void main() {
       mockAuth.currentUserIdStream,
     ).thenAnswer((_) => authStreamController.stream);
 
-    LoggerAccess.overrideLogger(mockLogger);
+    LoggerAccess.init(loggerService: MockLoggerService());
   });
 
   tearDown(() async {

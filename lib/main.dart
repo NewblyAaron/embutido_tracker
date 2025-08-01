@@ -21,7 +21,7 @@ void main() async {
       providers: globalProviders,
       child: Builder(
         builder: (context) {
-          LoggerAccess.init(context);
+          LoggerAccess.init(context: context);
           return const EmbutidoApp();
         },
       ),

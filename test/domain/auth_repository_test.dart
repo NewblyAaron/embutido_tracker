@@ -1,20 +1,22 @@
 import 'dart:async';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mocks/service_mocks.mocks.dart';
+import '../mocks/test_helpers.dart';
+
+late StreamController<String?> authStreamController;
+late AuthService auth;
+
+MockAuthService get mockAuth => auth as MockAuthService;
 
 void main() {
-  late StreamController<String?> authStreamController;
-  late MockAuthService mockAuth;
-  late MockLoggerService mockLogger;
-
   setUp(() {
     authStreamController = StreamController<String?>.broadcast();
-    mockAuth = MockAuthService();
-    mockLogger = MockLoggerService();
+    auth = MockAuthService();
 
     when(
       mockAuth.currentUserIdStream,
@@ -30,62 +32,65 @@ void main() {
   test(
     'given valid credentials when login is called expect authstate emit user id',
     () async {
-      final fakeUserId = "123";
-
       when(
         mockAuth.signIn(
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
       ).thenAnswer((_) async {
-        authStreamController.add(fakeUserId);
+        return Future.microtask(() => authStreamController.add(mockUserId));
       });
 
-      final emitted = <String?>[];
-      mockAuth.currentUserIdStream.listen(emitted.add);
+      final expectStreamEmitsUserId = expectLater(
+        auth.currentUserIdStream,
+        emits(mockUserId),
+      );
 
-      await mockAuth.signIn(email: 'test@example.com', password: '123456');
-      await Future.delayed(Duration.zero);
+      await auth.signIn(email: mockUserEmail, password: mockUserPassword);
 
-      verify(mockAuth.signIn(email: 'test@example.com', password: '123456'));
-      expect(emitted, [fakeUserId]);
+      verify(auth.signIn(email: mockUserEmail, password: mockUserPassword));
+      when(mockAuth.currentUserId).thenReturn(mockUserId);
+      expect(auth.currentUserId, mockUserId);
+
+      await expectStreamEmitsUserId;
     },
   );
 
   test('given invalid credentials when login is called expect throw', () async {
     when(
       mockAuth.signIn(email: anyNamed("email"), password: anyNamed("password")),
-    ).thenThrow(Exception("Invalid credentials"));
+    ).thenAnswer((_) => Future.error(Exception("Invalid credentials")));
 
     await expectLater(
-      () => mockAuth.signIn(email: 'wrong@incorrect.no', password: '654321'),
-      throwsA(isA<Exception>()),
+      auth.signIn(email: 'wrong@incorrect.no', password: '654321'),
+      throwsException,
     );
   });
 
   test(
-    'given valid credentials when signup is called expect authstate emit user',
+    'given valid credentials when signup is called expect authstate emit user id',
     () async {
-      final fakeUserId = "123";
-
       when(
         mockAuth.signUp(
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
       ).thenAnswer((_) {
-        authStreamController.add(fakeUserId);
-        return Future.value();
+        return Future.microtask(() => authStreamController.add(mockUserId));
       });
 
-      final emitted = <String?>[];
-      mockAuth.currentUserIdStream.listen(emitted.add);
+      final expectStreamEmitsUserId = expectLater(
+        auth.currentUserIdStream,
+        emits(mockUserId),
+      );
 
-      await mockAuth.signUp(email: 'test@example.com', password: '123456');
-      await Future.delayed(Duration.zero);
+      await auth.signUp(email: mockUserEmail, password: mockUserPassword);
 
-      verify(mockAuth.signUp(email: 'test@example.com', password: '123456'));
-      expect(emitted, [fakeUserId]);
+      verify(auth.signUp(email: mockUserEmail, password: mockUserPassword));
+      when(mockAuth.currentUserId).thenReturn(mockUserId);
+      expect(auth.currentUserId, mockUserId);
+
+      await expectStreamEmitsUserId;
     },
   );
 
@@ -97,11 +102,11 @@ void main() {
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
-      ).thenThrow(Exception("Invalid credentials"));
+      ).thenAnswer((_) => Future.error(Exception("Invalid credentials")));
 
       await expectLater(
-        () => mockAuth.signUp(email: 'wrong@incorrect.no', password: '654321'),
-        throwsA(isA<Exception>()),
+        () => auth.signUp(email: 'wrong@incorrect.no', password: '654321'),
+        throwsException,
       );
     },
   );
@@ -109,25 +114,26 @@ void main() {
   test(
     'given user signed in when signout is called expect authstate emit null',
     () async {
-      final fakeUserId = "123";
-
       when(mockAuth.signOut()).thenAnswer((_) async {
-        authStreamController.add(null);
+        return Future.microtask(() => authStreamController.add(null));
       });
 
-      final emitted = <String?>[];
-      mockAuth.currentUserIdStream.listen(emitted.add);
+      final expectStreamEmitsOrder = expectLater(
+        auth.currentUserIdStream,
+        emitsInOrder([mockUserId, null]),
+      );
 
       // simulate login
-      authStreamController.add(fakeUserId);
-      await Future.delayed(Duration.zero);
+      Future.microtask(() => authStreamController.add(mockUserId));
 
-      // signout
-      await mockAuth.signOut();
-      await Future.delayed(Duration.zero);
+      // sign out
+      await auth.signOut();
 
-      verify(mockAuth.signOut());
-      expect(emitted, [fakeUserId, null]);
+      verify(auth.signOut());
+      when(mockAuth.currentUserId).thenReturn(null);
+      expect(auth.currentUserId, null);
+
+      await expectStreamEmitsOrder;
     },
   );
 }

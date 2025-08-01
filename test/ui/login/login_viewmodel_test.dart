@@ -1,5 +1,5 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/entity/user.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/ui/login/login_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -7,8 +7,7 @@ import 'package:mockito/mockito.dart';
 import '../../mocks/service_mocks.mocks.dart';
 
 void main() {
-  late MockAuthService mockAuth;
-  late MockLoggerService mockLogger;
+  late AuthService mockAuth;
   late LoginViewModel viewModel;
 
   setUp(() {
@@ -21,10 +20,8 @@ void main() {
   test(
     'given valid credentials when login is successful expect error is null',
     () async {
-      final fakeUserId = "123";
-
       when(
-        mockAuth.signIn(
+        (mockAuth as MockAuthService).signIn(
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
@@ -40,7 +37,10 @@ void main() {
 
   test('given valid credentials when login failure expect error', () async {
     when(
-      mockAuth.signIn(email: anyNamed("email"), password: anyNamed("password")),
+      (mockAuth as MockAuthService).signIn(
+        email: anyNamed("email"),
+        password: anyNamed("password"),
+      ),
     ).thenThrow(Exception("Invalid login credentials"));
 
     await viewModel.login(email: "wrong@incorrect.no", password: "654321");

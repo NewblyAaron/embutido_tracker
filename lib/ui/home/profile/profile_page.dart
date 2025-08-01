@@ -1,5 +1,5 @@
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
-import 'package:embutido_tracker/domain/sources/auth_source.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/ui/home/profile/profile_header.dart';
 import 'package:embutido_tracker/ui/home/profile/profile_viewmodel.dart';
 import 'package:flutter/material.dart';

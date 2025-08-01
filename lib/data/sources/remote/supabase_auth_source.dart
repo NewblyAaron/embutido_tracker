@@ -1,5 +1,5 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/sources/auth_source.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseAuthSource implements AuthService {

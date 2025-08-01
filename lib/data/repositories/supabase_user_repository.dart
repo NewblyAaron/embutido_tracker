@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
-import 'package:embutido_tracker/domain/sources/auth_source.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
 
 class SupabaseUserRepository implements UserRepository {

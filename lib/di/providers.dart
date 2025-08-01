@@ -7,7 +7,7 @@ import 'package:embutido_tracker/data/sources/remote/supabase_storage_source.dar
 import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
-import 'package:embutido_tracker/domain/sources/auth_source.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';

@@ -1,4 +1,4 @@
-import 'package:embutido_tracker/domain/sources/auth_source.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/ui/login/login_card.dart';
 import 'package:embutido_tracker/ui/login/login_viewmodel.dart';
 import 'package:flutter/material.dart';

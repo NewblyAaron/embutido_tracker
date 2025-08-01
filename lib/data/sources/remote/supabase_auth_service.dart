@@ -2,10 +2,10 @@ import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
-class SupabaseAuthSource implements AuthService {
+class SupabaseAuthService implements AuthService {
   final GoTrueClient _client;
 
-  SupabaseAuthSource(SupabaseClient client) : _client = client.auth;
+  SupabaseAuthService(SupabaseClient client) : _client = client.auth;
 
   @override
   String? get currentUserId => _client.currentUser?.id;

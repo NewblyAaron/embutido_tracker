@@ -1,7 +1,7 @@
 import 'package:embutido_tracker/core/services/image_service.dart';
 import 'package:embutido_tracker/core/services/logger_service.dart';
 import 'package:embutido_tracker/data/repositories/supabase_user_repository.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_auth_source.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_auth_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_cache_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_storage_source.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
@@ -25,7 +25,7 @@ final supabaseProviders = [
 
 final authProviders = [
   Provider<AuthService>(
-    create: (context) => SupabaseAuthSource(context.read<SupabaseClient>()),
+    create: (context) => SupabaseAuthService(context.read<SupabaseClient>()),
   ),
 ];
 

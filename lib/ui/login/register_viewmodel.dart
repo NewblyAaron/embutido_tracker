@@ -1,5 +1,5 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/repositories/auth_repository.dart';
+import 'package:embutido_tracker/domain/sources/auth_source.dart';
 import 'package:flutter/material.dart';
 
 class RegisterViewModel extends ChangeNotifier {
@@ -17,14 +17,9 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _auth.signUp(email: email, password: password);
-
-      if (response != null) {
-        LoggerAccess.logger.debug("Successfully signed up");
-        return true;
-      } else {
-        return false;
-      }
+      await _auth.signUp(email: email, password: password);
+      LoggerAccess.logger.debug("Successfully signed up");
+      return true;
     } catch (e) {
       _error = "Signup failed: ${e.toString().replaceFirst("Exception: ", "")}";
       LoggerAccess.logger.error(_error!);

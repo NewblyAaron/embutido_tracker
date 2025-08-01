@@ -25,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   void _onBottomNavBarItemTapped(int index) => setState(() {
-    LoggerAccess.logger.debug("Navigating to index $index");
     _selectedIndex = index;
     _pageController.animateToPage(
       index,

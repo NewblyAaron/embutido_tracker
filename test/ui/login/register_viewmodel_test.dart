@@ -4,7 +4,7 @@ import 'package:embutido_tracker/ui/login/register_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../mocks/mocks.mocks.dart';
+import '../../mocks/service_mocks.mocks.dart';
 
 void main() {
   late MockAuthService mockAuth;
@@ -22,7 +22,7 @@ void main() {
   test(
     'given valid credentials when signup is successful expect error is null',
     () async {
-      final fakeUser = User(id: "123", email: "test@example.com");
+      final fakeUserId = "123";
 
       when(
         mockAuth.signUp(
@@ -30,7 +30,7 @@ void main() {
           password: anyNamed("password"),
         ),
       ).thenAnswer((_) async {
-        return fakeUser;
+        // success
       });
 
       await viewModel.signUp(email: "test@example.com", password: "123456");

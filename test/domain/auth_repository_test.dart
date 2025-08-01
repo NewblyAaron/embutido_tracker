@@ -1,24 +1,23 @@
 import 'dart:async';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../mocks/mocks.mocks.dart';
+import '../mocks/service_mocks.mocks.dart';
 
 void main() {
-  late StreamController<User?> authStreamController;
+  late StreamController<String?> authStreamController;
   late MockAuthService mockAuth;
   late MockLoggerService mockLogger;
 
   setUp(() {
-    authStreamController = StreamController<User?>.broadcast();
+    authStreamController = StreamController<String?>.broadcast();
     mockAuth = MockAuthService();
     mockLogger = MockLoggerService();
 
     when(
-      mockAuth.onAuthStateChanged,
+      mockAuth.currentUserIdStream,
     ).thenAnswer((_) => authStreamController.stream);
 
     LoggerAccess.overrideLogger(mockLogger);
@@ -29,9 +28,9 @@ void main() {
   });
 
   test(
-    'given valid credentials when login is called expect authstate emit user',
+    'given valid credentials when login is called expect authstate emit user id',
     () async {
-      final fakeUser = User(id: "123", email: "test@example.com");
+      final fakeUserId = "123";
 
       when(
         mockAuth.signIn(
@@ -39,67 +38,54 @@ void main() {
           password: anyNamed("password"),
         ),
       ).thenAnswer((_) async {
-        authStreamController.add(fakeUser);
-        return fakeUser;
+        authStreamController.add(fakeUserId);
       });
 
-      final emitted = <User?>[];
-      mockAuth.onAuthStateChanged.listen(emitted.add);
-      final result = await mockAuth.signIn(
-        email: 'test@example.com',
-        password: '123456',
-      );
+      final emitted = <String?>[];
+      mockAuth.currentUserIdStream.listen(emitted.add);
 
-      expect(result, isNotNull);
-      expect(result?.id, equals("123"));
-      expect(result?.email, equals("test@example.com"));
-      expect(emitted, [fakeUser]);
+      await mockAuth.signIn(email: 'test@example.com', password: '123456');
+      await Future.delayed(Duration.zero);
+
+      verify(mockAuth.signIn(email: 'test@example.com', password: '123456'));
+      expect(emitted, [fakeUserId]);
     },
   );
 
-  test(
-    'given invalid credentials when login is called expect throw',
-    () async {
-      when(
-        mockAuth.signIn(
-          email: anyNamed("email"),
-          password: anyNamed("password"),
-        ),
-      ).thenThrow(Exception("Invalid credentials"));
+  test('given invalid credentials when login is called expect throw', () async {
+    when(
+      mockAuth.signIn(email: anyNamed("email"), password: anyNamed("password")),
+    ).thenThrow(Exception("Invalid credentials"));
 
-      await expectLater(
-        () => mockAuth.signIn(email: 'wrong@incorrect.no', password: '654321'),
-        throwsA(isA<Exception>()),
-      );
-    },
-  );
+    await expectLater(
+      () => mockAuth.signIn(email: 'wrong@incorrect.no', password: '654321'),
+      throwsA(isA<Exception>()),
+    );
+  });
 
   test(
     'given valid credentials when signup is called expect authstate emit user',
     () async {
-      final fakeUser = User(id: "123", email: "test@example.com");
+      final fakeUserId = "123";
 
       when(
-        mockAuth.signIn(
+        mockAuth.signUp(
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
-      ).thenAnswer((_) async {
-        authStreamController.add(fakeUser);
-        return fakeUser;
+      ).thenAnswer((_) {
+        authStreamController.add(fakeUserId);
+        return Future.value();
       });
 
-      final emitted = <User?>[];
-      mockAuth.onAuthStateChanged.listen(emitted.add);
-      final result = await mockAuth.signIn(
-        email: 'test@example.com',
-        password: '123456',
-      );
+      final emitted = <String?>[];
+      mockAuth.currentUserIdStream.listen(emitted.add);
 
-      expect(result, isNotNull);
-      expect(result?.id, equals("123"));
-      expect(result?.email, equals("test@example.com"));
-      expect(emitted, [fakeUser]);
+      await mockAuth.signUp(email: 'test@example.com', password: '123456');
+      await Future.delayed(Duration.zero);
+
+      verify(mockAuth.signUp(email: 'test@example.com', password: '123456'));
+      expect(emitted, [fakeUserId]);
     },
   );
 
@@ -123,23 +109,25 @@ void main() {
   test(
     'given user signed in when signout is called expect authstate emit null',
     () async {
+      final fakeUserId = "123";
+
       when(mockAuth.signOut()).thenAnswer((_) async {
         authStreamController.add(null);
       });
 
-      final emitted = <User?>[];
-      mockAuth.onAuthStateChanged.listen(emitted.add);
+      final emitted = <String?>[];
+      mockAuth.currentUserIdStream.listen(emitted.add);
 
       // simulate login
-      final signedInUser = User(id: "123", email: "test@example.com");
-      authStreamController.add(signedInUser);
+      authStreamController.add(fakeUserId);
       await Future.delayed(Duration.zero);
 
       // signout
       await mockAuth.signOut();
       await Future.delayed(Duration.zero);
 
-      expect(emitted, [signedInUser, null]);
+      verify(mockAuth.signOut());
+      expect(emitted, [fakeUserId, null]);
     },
   );
 }

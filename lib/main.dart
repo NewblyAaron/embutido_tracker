@@ -37,11 +37,18 @@ class EmbutidoApp extends StatelessWidget {
     return MaterialApp(
       home: StreamBuilder(
         stream: context.read<UserRepository>().userStream,
-        builder:
-            (context, snapshot) =>
-                snapshot.data != null
-                    ? Provider.value(value: snapshot.data!, child: HomeScreen())
-                    : LoginScreen(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            LoggerAccess.logger.debug("Loading user...");
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return snapshot.data != null
+              ? Provider.value(value: snapshot.data!, child: HomeScreen())
+              : LoginScreen();
+        },
       ),
     );
   }

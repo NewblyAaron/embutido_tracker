@@ -21,6 +21,9 @@ class ProfileViewModel extends ChangeNotifier {
     LoggerAccess.logger.debug("Updating username");
 
     try {
+      _error = null;
+      notifyListeners();
+
       await _repository.updateUsername(userName);
     } catch (e) {
       _error =
@@ -33,6 +36,7 @@ class ProfileViewModel extends ChangeNotifier {
   Future<void> updateAvatar(Uint8List imageBytes) async {
     try {
       isUploading = true;
+      _error = null;
       notifyListeners();
 
       await _repository.uploadAvatar(imageBytes);
@@ -40,7 +44,6 @@ class ProfileViewModel extends ChangeNotifier {
       _error =
           "Updating avatar failed: ${e.toString().replaceFirst("Exception: ", "")}";
       LoggerAccess.logger.error("Error in updating avatar: $_error");
-      notifyListeners();
     } finally {
       isUploading = false;
       notifyListeners();

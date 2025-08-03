@@ -17,10 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<BottomNavigationBarItem> _navItems = [
     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
     BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.abc),
-      label: "Placeholder",
-    ),
+    BottomNavigationBarItem(icon: Icon(Icons.abc), label: "Placeholder"),
   ];
 
   void _onBottomNavBarItemTapped(int index) => setState(() {

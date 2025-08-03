@@ -4,7 +4,7 @@ pre-commit:
     - name: Flutter linter
       run: flutter analyze
     - name: Run tests
-      run: flutter test
+      run: flutter test --reporter=failures-only
     - name: Dart format check
       run: dart format . --output=none --set-exit-if-changed
 
@@ -14,6 +14,6 @@ pre-push:
     - name: Flutter linter
       run: flutter analyze
     - name: Run tests
-      run: flutter test
+      run: flutter test --reporter=failures-only
     - name: Dart format check
       run: dart format . --output=none --set-exit-if-changed

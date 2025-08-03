@@ -15,4 +15,17 @@ class User {
 
   @override
   String toString() => "$userName [$id]";
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          email == other.email &&
+          userName == other.userName &&
+          avatarUrl == other.avatarUrl;
+
+  @override
+  int get hashCode => Object.hashAll([id, email, userName, avatarUrl]);
 }

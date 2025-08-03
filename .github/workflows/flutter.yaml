@@ -54,6 +54,9 @@ jobs:
             build/
           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
 
+      - name: Run build_runner
+        run: flutter pub run build_runner build
+
       - name: Run linter
         run: flutter analyze
 
@@ -75,7 +78,7 @@ jobs:
             build/
           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
 
-      - name: Run build_runner for mocks
+      - name: Run build_runner
         run: flutter pub run build_runner build
 
       - name: Run tests

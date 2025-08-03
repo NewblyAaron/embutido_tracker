@@ -23,6 +23,7 @@ class _MapPageBody extends StatefulWidget {
 class _MapPageBodyState extends State<_MapPageBody> {
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final viewModel = context.read<MapViewModel>();
 
     return Center(child: Text("Map Screen"));

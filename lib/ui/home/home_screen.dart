@@ -1,4 +1,3 @@
-import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/ui/home/map/map_page.dart';
 import 'package:embutido_tracker/ui/home/profile/profile_page.dart';
 import 'package:flutter/material.dart';

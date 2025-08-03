@@ -1,36 +1,31 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/ui/login/register_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../mocks/mocks.mocks.dart';
+import '../../mocks/service_mocks.mocks.dart';
 
 void main() {
   late MockAuthService mockAuth;
-  late MockLoggerService mockLogger;
   late RegisterViewModel viewModel;
 
   setUp(() {
     mockAuth = MockAuthService();
-    mockLogger = MockLoggerService();
 
-    LoggerAccess.overrideLogger(mockLogger);
+    LoggerAccess.init(loggerService: MockLoggerService());
     viewModel = RegisterViewModel(auth: mockAuth);
   });
 
   test(
     'given valid credentials when signup is successful expect error is null',
     () async {
-      final fakeUser = User(id: "123", email: "test@example.com");
-
       when(
         mockAuth.signUp(
           email: anyNamed("email"),
           password: anyNamed("password"),
         ),
       ).thenAnswer((_) async {
-        return fakeUser;
+        // success
       });
 
       await viewModel.signUp(email: "test@example.com", password: "123456");

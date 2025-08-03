@@ -1,5 +1,5 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/repositories/auth_repository.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -17,11 +17,8 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _auth.signIn(email: email, password: password);
-
-      if (response != null) {
-        LoggerAccess.logger.debug("Successfully logged in");
-      }
+      await _auth.signIn(email: email, password: password);
+      LoggerAccess.logger.debug("Successfully logged in");
     } catch (e) {
       _error = "Login failed: ${e.toString().replaceFirst("Exception: ", "")}";
       LoggerAccess.logger.error(_error!);

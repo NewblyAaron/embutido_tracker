@@ -1,4 +1,4 @@
-import 'package:embutido_tracker/domain/repositories/auth_repository.dart';
+import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/ui/login/register_card.dart';
 import 'package:embutido_tracker/ui/login/register_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class RegisterScreen extends StatelessWidget {
 }
 
 class _RegisterScreenBody extends StatefulWidget {
-  const _RegisterScreenBody({super.key});
+  const _RegisterScreenBody();
 
   @override
   State<_RegisterScreenBody> createState() => _RegisterScreenBodyState();

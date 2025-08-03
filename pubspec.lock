@@ -185,6 +185,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.4"
+  cli_util:
+    dependency: transitive
+    description:
+      name: cli_util
+      sha256: ff6785f7e9e3c38ac98b2fb035701789de90154024a75b6cb926445e83197d1c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.2"
   clock:
     dependency: transitive
     description:
@@ -368,6 +376,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  globbing:
+    dependency: transitive
+    description:
+      name: globbing
+      sha256: "4f89cfaf6fa74c9c1740a96259da06bd45411ede56744e28017cc534a12b6e2d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   gotrue:
     dependency: transitive
     description:
@@ -536,6 +552,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  lefthook_dart:
+    dependency: "direct dev"
+    description:
+      path: "."
+      ref: "feat/windows-support"
+      resolved-ref: "0cfd103dcf27cd5b89546e3216df268044978d84"
+      url: "https://github.com/NewblyAaron/lefthook_dart"
+    source: git
+    version: "1.0.6"
   lints:
     dependency: transitive
     description:
@@ -981,6 +1006,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.0"
+  system_info3:
+    dependency: transitive
+    description:
+      name: system_info3
+      sha256: "86b296fe08ec5062f96379982ff2dfea94be349e63f970b534453997cee34738"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.1"
   term_glyph:
     dependency: transitive
     description:

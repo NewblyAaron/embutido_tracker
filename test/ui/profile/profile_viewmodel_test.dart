@@ -115,9 +115,4 @@ void main() {
       verify(auth.signOut()).called(1);
     },
   );
-
-  test('deliberate failure', () {
-    print("this test case will always fail");
-    expect(true, equals(false));
-  });
 }

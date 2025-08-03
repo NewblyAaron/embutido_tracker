@@ -82,4 +82,12 @@ jobs:
         run: flutter pub run build_runner build
 
       - name: Run tests
-        run: flutter test --reporter=github
+        run: flutter test --file-reporter="json:reports/tests.json"
+
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: Flutter tests
+          path: reports/tests.json
+          reporter: flutter-json

@@ -4,7 +4,7 @@ class User {
   final String? userName;
   final String? avatarUrl;
 
-  User({required this.id, required this.email, this.userName, this.avatarUrl});
+  User({required this.id, this.email, this.userName, this.avatarUrl});
 
   User copyWith({String? userName, String? avatarUrl}) => User(
     id: id,

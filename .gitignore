@@ -46,3 +46,6 @@ app.*.map.json
 
 # Ignore all Mockito-generated mock files under test/mocks recursively
 /test/mocks/**/*.mocks.dart
+
+# Ignore local lefthook config
+lefthook-local.yml

@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: Flutter linter
+      run: flutter analyze
+    - name: Run tests
+      run: flutter test
+    - name: Dart format check
+      run: dart format . --output=none --set-exit-if-changed
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: Flutter linter
+      run: flutter analyze
+    - name: Run tests
+      run: flutter test
+    - name: Dart format check
+      run: dart format . --output=none --set-exit-if-changed

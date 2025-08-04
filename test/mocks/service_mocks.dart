@@ -4,5 +4,5 @@ import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:mockito/annotations.dart';
 
-@GenerateMocks([AuthService, LoggerService, ImageService, AvatarCacheService])
+@GenerateMocks([AuthService, LoggerService, ImageService, AvatarService])
 void main() {}

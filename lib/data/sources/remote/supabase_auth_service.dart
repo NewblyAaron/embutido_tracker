@@ -1,64 +1,59 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
+import 'package:embutido_tracker/domain/sources/query_interfaces.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_auth_query.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseAuthService implements AuthService {
-  final GoTrueClient _client;
+  final AuthQuery _query;
 
-  SupabaseAuthService(SupabaseClient client) : _client = client.auth;
+  SupabaseAuthService(this._query);
+
+  SupabaseAuthService.fromClient(SupabaseClient client)
+    : _query = SupabaseAuthQueryImpl(client);
 
   @override
-  String? get currentUserId => _client.currentUser?.id;
+  String? get currentUserId => _query.currentUserId;
 
   @override
   Stream<String?> get currentUserIdStream =>
-      _client.onAuthStateChange.map((event) {
-        final userId = event.session?.user.id;
-        LoggerAccess.logger.debug("AuthState changed, new ID: $userId");
-        return userId;
+      _query.currentUserIdStream.map((event) {
+        LoggerAccess.logger.debug("Authenticated User ID changed: $event");
+        return event;
       });
 
   @override
   Future<void> signIn({required String email, required String password}) async {
     try {
-      final response = await _client.signInWithPassword(
-        email: email,
-        password: password,
-      );
-
-      if (response.session == null || response.user == null) {
-        throw AuthException("No session/user returned");
-      }
-
-      LoggerAccess.logger.debug("Logged in! ${response.user!.id}");
-    } on AuthException catch (e) {
-      LoggerAccess.logger.error("Auth failed: ${e.message}");
-      throw Exception(e.message);
+      LoggerAccess.logger.debug("Trying to sign in");
+      final userId = await _query.signIn(email: email, password: password);
+      LoggerAccess.logger.debug("Signed in as $userId");
     } catch (e) {
-      LoggerAccess.logger.error("Unknown login error: $e");
-      throw Exception("Unexpected error: $e");
+      LoggerAccess.logger.debug("Sign-in error: $e");
+      rethrow;
     }
   }
 
   @override
-  Future<void> signOut() async => await _client.signOut();
+  Future<void> signOut() async {
+    try {
+      await _query.signOut();
+      LoggerAccess.logger.debug("Signed out");
+    } catch (e) {
+      LoggerAccess.logger.debug("Sign-out error: $e");
+      rethrow;
+    }
+  }
 
   @override
   Future<void> signUp({required String email, required String password}) async {
     try {
-      final response = await _client.signUp(email: email, password: password);
-
-      if (response.session == null || response.user == null) {
-        throw AuthException("No session/user returned");
-      }
-
-      LoggerAccess.logger.debug("Registered! ${response.user!.id}");
-    } on AuthException catch (e) {
-      LoggerAccess.logger.error("Auth failed: ${e.message}");
-      throw Exception(e.message);
+      LoggerAccess.logger.debug("Trying to sign up");
+      final userId = await _query.signUp(email: email, password: password);
+      LoggerAccess.logger.debug("Signed up and authenticated as $userId");
     } catch (e) {
-      LoggerAccess.logger.error("Unknown signup error: $e");
-      throw Exception("Unexpected error: $e");
+      LoggerAccess.logger.debug("Sign-up error: $e");
+      rethrow;
     }
   }
 }

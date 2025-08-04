@@ -1,5 +1,7 @@
-abstract class AvatarCacheService {
+import 'dart:typed_data';
+
+abstract class AvatarService {
   Future<String?> getAvatarUrl(String userId);
-  Future<void> invalidate(String userId);
-  Future<void> invalidateAll();
+  Future<void> uploadAvatar(String userId, Uint8List imageBytes);
+  Future<void> deleteAvatar(String userId);
 }

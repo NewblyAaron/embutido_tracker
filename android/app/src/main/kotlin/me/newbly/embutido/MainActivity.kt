@@ -1,4 +1,4 @@
-package com.example.embutido_tracker
+package me.newbly.embutido
 
 import io.flutter.embedding.android.FlutterActivity
 

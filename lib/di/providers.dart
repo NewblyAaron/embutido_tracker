@@ -1,6 +1,8 @@
 import 'package:embutido_tracker/core/services/image_service.dart';
 import 'package:embutido_tracker/core/services/logger_service.dart';
 import 'package:embutido_tracker/data/repositories/supabase_user_repository.dart';
+import 'package:embutido_tracker/data/sources/local/geolocator_gps_service.dart';
+import 'package:embutido_tracker/data/sources/local/permission_handler_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_auth_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_storage_query.dart';
@@ -9,6 +11,8 @@ import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
+import 'package:embutido_tracker/domain/services/gps_service.dart';
+import 'package:embutido_tracker/domain/services/permission_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +22,10 @@ final coreProviders = [
   Provider<LoggerService>(create: (_) => LoggerService()),
   Provider<ImageService>(create: (_) => ImageService()),
   Provider<BaseCacheManager>(create: (_) => DefaultCacheManager()),
+];
+
+final permissionProviders = [
+  Provider<PermissionService>(create: (_) => PermissionHandlerService()),
 ];
 
 final supabaseProviders = [
@@ -70,9 +78,15 @@ final userProviders = [
   ),
 ];
 
+final gpsProviders = [
+  Provider<GPSService>(create: (context) => GeolocatorService()),
+];
+
 final globalProviders = [
   ...coreProviders,
+  ...permissionProviders,
   ...supabaseProviders,
   ...authProviders,
   ...userProviders,
+  ...gpsProviders,
 ];

@@ -1,19 +1,15 @@
-import 'package:embutido_tracker/domain/sources/query_interfaces.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseAuthQueryImpl implements AuthQuery {
+class SupabaseAuthQuery {
   final GoTrueClient _client;
 
-  SupabaseAuthQueryImpl(SupabaseClient client) : _client = client.auth;
+  SupabaseAuthQuery(SupabaseClient client) : _client = client.auth;
 
-  @override
   String? get currentUserId => _client.currentUser?.id;
 
-  @override
   Stream<String?> get currentUserIdStream =>
       _client.onAuthStateChange.map((event) => event.session?.user.id);
 
-  @override
   Future<String> signIn({
     required String email,
     required String password,
@@ -37,7 +33,6 @@ class SupabaseAuthQueryImpl implements AuthQuery {
     }
   }
 
-  @override
   Future<String> signUp({
     required String email,
     required String password,
@@ -58,6 +53,5 @@ class SupabaseAuthQueryImpl implements AuthQuery {
     }
   }
 
-  @override
   Future<void> signOut() async => await _client.signOut();
 }

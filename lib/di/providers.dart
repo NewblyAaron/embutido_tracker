@@ -6,12 +6,14 @@ import 'package:embutido_tracker/data/sources/local/permission_handler_service.d
 import 'package:embutido_tracker/data/sources/remote/supabase_auth_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_storage_source.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_user_location_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:embutido_tracker/domain/services/gps_service.dart';
 import 'package:embutido_tracker/domain/services/permission_service.dart';
+import 'package:embutido_tracker/domain/services/user_location_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';
@@ -43,14 +45,6 @@ final authProviders = [
 ];
 
 final userProviders = [
-  Provider<SupabaseStorageSource>(
-    create: (context) {
-      final storageQuery = SupabaseAvatarStorageQuery(
-        context.read<SupabaseClient>().storage,
-      );
-      return SupabaseStorageSource(storageQuery);
-    },
-  ),
   Provider<AvatarService>(
     create:
         (context) => SupabaseAvatarService(
@@ -76,6 +70,16 @@ final userProviders = [
         ),
     dispose: (context, repository) {
       if (repository is SupabaseUserRepository) repository.dispose();
+    },
+  ),
+  Provider<UserLocationService>(
+    create:
+        (context) => SupabaseUserLocationService(
+          context.read<SupabaseClient>(),
+          context.read<UserRemoteSource>(),
+        ),
+    dispose: (context, service) {
+      if (service is SupabaseUserLocationService) service.dispose();
     },
   ),
 ];

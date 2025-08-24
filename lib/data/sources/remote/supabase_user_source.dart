@@ -1,28 +1,31 @@
 import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/sources/query_interfaces.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_user_table_query.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_group_query.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_user_query.dart';
+import 'package:embutido_tracker/domain/entity/group.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseUserSource implements UserRemoteSource {
-  final TableQuery<User> _query;
+  final SupabaseUserQuery _userQuery;
+  final SupabaseGroupQuery _groupQuery;
   final AvatarService _avatarService;
 
-  SupabaseUserSource(this._query, this._avatarService);
+  SupabaseUserSource(this._userQuery, this._groupQuery, this._avatarService);
 
   SupabaseUserSource.fromClient(SupabaseClient client, this._avatarService)
-    : _query = SupabaseUserTableQuery(client);
+    : _userQuery = SupabaseUserQuery(client),
+      _groupQuery = SupabaseGroupQuery(client);
 
   @override
   Future<User> getUser(String userId) async {
     try {
       LoggerAccess.logger.debug("Getting data of user $userId");
 
-      final user = await _query.selectById(userId);
+      final user = await _userQuery.selectById(userId);
       final avatarUrl = await _avatarService.getAvatarUrl(userId);
 
       LoggerAccess.logger.debug(
@@ -30,6 +33,18 @@ class SupabaseUserSource implements UserRemoteSource {
       );
 
       return user.copyWith(avatarUrl: avatarUrl);
+    } catch (e) {
+      LoggerAccess.logger.error("Supabase select error: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<Group>> getGroups(String userId) async {
+    try {
+      LoggerAccess.logger.debug("Getting groups of user $userId");
+
+      return await _groupQuery.selectByUserId(userId);
     } catch (e) {
       LoggerAccess.logger.error("Supabase select error: $e");
       rethrow;
@@ -53,7 +68,7 @@ class SupabaseUserSource implements UserRemoteSource {
       LoggerAccess.logger.debug("Updating $userId's username to $userName");
 
       final newData = <String, dynamic>{'user_name': userName};
-      await _query.updateById(userId, updateData: newData);
+      await _userQuery.updateById(userId, updateData: newData);
 
       LoggerAccess.logger.debug("Updated $userId's username to $userName");
     } catch (e) {

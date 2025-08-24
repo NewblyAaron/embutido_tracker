@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
+import 'package:embutido_tracker/domain/entity/group.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
@@ -38,6 +39,10 @@ class SupabaseUserRepository implements UserRepository {
 
   @override
   Future<User> getUserById(String userId) => _remoteSource.getUser(userId);
+
+  @override
+  Future<List<Group>> getGroupsByUserId(String userId) =>
+      _remoteSource.getGroups(userId);
 
   @override
   Future<void> updateUsername(String newUsername) async {

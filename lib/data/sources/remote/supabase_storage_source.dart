@@ -2,11 +2,13 @@ import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_avatar_query.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseStorageSource {
   final SupabaseAvatarQuery _query;
 
-  SupabaseStorageSource(this._query);
+  SupabaseStorageSource(SupabaseClient client)
+    : _query = SupabaseAvatarQuery(client.storage);
 
   final Duration fileExpiry = const Duration(hours: 1);
 

@@ -1,20 +1,20 @@
 class User {
   final String id;
   final String? email;
-  final String? userName;
+  final String? name;
   final String? avatarUrl;
 
-  User({required this.id, this.email, this.userName, this.avatarUrl});
+  User({required this.id, this.email, this.name, this.avatarUrl});
 
-  User copyWith({String? userName, String? avatarUrl}) => User(
+  User copyWith({String? name, String? avatarUrl}) => User(
     id: id,
     email: email,
-    userName: userName ?? this.userName,
+    name: name ?? this.name,
     avatarUrl: avatarUrl ?? this.avatarUrl,
   );
 
   @override
-  String toString() => "$userName [$id]";
+  String toString() => "User [$id]: $name";
 
   @override
   bool operator ==(Object other) =>
@@ -23,9 +23,9 @@ class User {
           runtimeType == other.runtimeType &&
           id == other.id &&
           email == other.email &&
-          userName == other.userName &&
+          name == other.name &&
           avatarUrl == other.avatarUrl;
 
   @override
-  int get hashCode => Object.hashAll([id, email, userName, avatarUrl]);
+  int get hashCode => Object.hashAll([id, email, name, avatarUrl]);
 }

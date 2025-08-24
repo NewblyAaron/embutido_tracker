@@ -95,13 +95,12 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  user.userName ?? '',
+                  user.name ?? '',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   onPressed:
-                      () =>
-                          _onEditUserNamePressed(context, user.userName ?? ''),
+                      () => _onEditUserNamePressed(context, user.name ?? ''),
                   icon: Icon(Icons.edit),
                   tooltip: "Edit username",
                 ),

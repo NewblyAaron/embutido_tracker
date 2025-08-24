@@ -1,16 +1,15 @@
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/sources/query_interfaces.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_auth_query.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_auth_query.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseAuthService implements AuthService {
-  final AuthQuery _query;
+  final SupabaseAuthQuery _query;
 
   SupabaseAuthService(this._query);
 
   SupabaseAuthService.fromClient(SupabaseClient client)
-    : _query = SupabaseAuthQueryImpl(client);
+    : _query = SupabaseAuthQuery(client);
 
   @override
   String? get currentUserId => _query.currentUserId;

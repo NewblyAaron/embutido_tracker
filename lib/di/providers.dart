@@ -5,7 +5,6 @@ import 'package:embutido_tracker/data/sources/local/geolocator_gps_service.dart'
 import 'package:embutido_tracker/data/sources/local/permission_handler_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_auth_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_service.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_avatar_storage_query.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_storage_source.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
@@ -30,6 +29,9 @@ final permissionProviders = [
 
 final supabaseProviders = [
   Provider<SupabaseClient>(create: (_) => Supabase.instance.client),
+  Provider<SupabaseStorageSource>(
+    create: (context) => SupabaseStorageSource(context.read<SupabaseClient>());,
+  ),
 ];
 
 final authProviders = [

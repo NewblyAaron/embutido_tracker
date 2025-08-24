@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/sources/query_interfaces.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_avatar_query.dart';
 
 class SupabaseStorageSource {
-  final StorageQuery _query;
+  final SupabaseAvatarQuery _query;
 
   SupabaseStorageSource(this._query);
 

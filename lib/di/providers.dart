@@ -32,7 +32,7 @@ final permissionProviders = [
 final supabaseProviders = [
   Provider<SupabaseClient>(create: (_) => Supabase.instance.client),
   Provider<SupabaseStorageSource>(
-    create: (context) => SupabaseStorageSource(context.read<SupabaseClient>());,
+    create: (context) => SupabaseStorageSource(context.read<SupabaseClient>()),
   ),
 ];
 

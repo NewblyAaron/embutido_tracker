@@ -32,10 +32,8 @@ class SupabaseGroupSource implements GroupRemoteSource {
   }
 
   @override
-  Future<void> addGroupMember(String groupId, String userId) {
-    // TODO: implement addGroupMember
-    throw UnimplementedError();
-  }
+  Future<bool> joinGroup(String userId, String joinCode) =>
+      _query.joinGroup(userId, joinCode);
 
   @override
   Future<void> removeGroupMember(String groupId, String userId) {

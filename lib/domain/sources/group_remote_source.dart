@@ -7,7 +7,7 @@ abstract class GroupRemoteSource {
     required String name,
     required String creatorUserId,
   });
+  Future<bool> joinGroup(String userId, String joinCode);
   Future<void> deleteGroup(String groupId);
-  Future<void> addGroupMember(String groupId, String userId);
   Future<void> removeGroupMember(String groupId, String userId);
 }

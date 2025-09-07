@@ -15,6 +15,14 @@ class SupabaseUserQuery {
       .single()
       .withConverter((data) => SupabaseUserMapper.fromMap(data));
 
+  Future<List<User>> selectByIds(List<String> ids) => _client
+      .from(usersTableName)
+      .select()
+      .inFilter('id', ids)
+      .withConverter(
+        (data) => data.map((e) => SupabaseUserMapper.fromMap(e)).toList(),
+      );
+
   Future<void> updateById(
     String id, {
     required Map<String, dynamic> updateData,

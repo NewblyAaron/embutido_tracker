@@ -1,9 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_group_query.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_queries/supabase_user_query.dart';
-import 'package:embutido_tracker/domain/entity/group.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:embutido_tracker/domain/sources/user_remote_source.dart';
@@ -11,14 +9,12 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class SupabaseUserSource implements UserRemoteSource {
   final SupabaseUserQuery _userQuery;
-  final SupabaseGroupQuery _groupQuery;
   final AvatarService _avatarService;
 
-  SupabaseUserSource(this._userQuery, this._groupQuery, this._avatarService);
+  SupabaseUserSource(this._userQuery, this._avatarService);
 
   SupabaseUserSource.fromClient(SupabaseClient client, this._avatarService)
-    : _userQuery = SupabaseUserQuery(client),
-      _groupQuery = SupabaseGroupQuery(client);
+    : _userQuery = SupabaseUserQuery(client);
 
   @override
   Future<User> getUser(String userId) async {
@@ -40,11 +36,29 @@ class SupabaseUserSource implements UserRemoteSource {
   }
 
   @override
-  Future<List<Group>> getGroups(String userId) async {
+  Future<List<User>> getUsers(List<String> userIds) async {
     try {
-      LoggerAccess.logger.debug("Getting groups of user $userId");
+      final usersMap = Map.fromEntries(
+        (await _userQuery.selectByIds(
+          userIds,
+        )).map((user) => MapEntry(user.id, user)),
+      );
 
-      return await _groupQuery.selectByUserId(userId);
+      final futures = userIds.map((id) async {
+        final url = await _avatarService.getAvatarUrl(id);
+        return MapEntry(id, url);
+      });
+      final avatarUrlsMap = Map.fromEntries(await Future.wait(futures));
+
+      for (final entry in avatarUrlsMap.entries) {
+        final userId = entry.key;
+        final url = entry.value;
+
+        final user = usersMap[userId];
+        usersMap[userId] = user!.copyWith(avatarUrl: url);
+      }
+
+      return usersMap.values.toList();
     } catch (e) {
       LoggerAccess.logger.error("Supabase select error: $e");
       rethrow;

@@ -64,7 +64,6 @@ class SupabaseGroupQuery {
     String id, {
     required Map<String, dynamic> updateData,
   }) async {
-    // TODO: updateById implementation
     final result = await _client
         .from(groupTableName)
         .update(updateData)
@@ -78,4 +77,24 @@ class SupabaseGroupQuery {
 
   Future<void> deleteById(String id) =>
       _client.from(groupTableName).delete().eq('id', id);
+
+  Future<bool> joinGroup(String userId, String joinCode) async {
+    final response = await _client
+        .rpc(
+          'join_group',
+          params: {'p_user_id': userId, 'p_join_code': joinCode},
+        )
+        .withConverter((data) => data as String);
+
+    switch (response) {
+      case 'success':
+        return true;
+      case 'already_member':
+        throw Exception("User is already a member");
+      case 'invalid_code':
+        throw Exception("Invalid group join code");
+      default:
+        throw Exception("How'd you get here?");
+    }
+  }
 }

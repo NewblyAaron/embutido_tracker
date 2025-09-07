@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:embutido_tracker/core/logging/logger_access.dart';
-import 'package:embutido_tracker/domain/entity/group.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
@@ -23,6 +22,7 @@ class SupabaseUserRepository implements UserRepository {
         .listen((user) => _userStreamController.add(user));
   }
 
+  @override
   String get currentUserId {
     final userId = _auth.currentUserId;
     if (userId == null) throw Exception("User not logged in");
@@ -39,10 +39,6 @@ class SupabaseUserRepository implements UserRepository {
 
   @override
   Future<User> getUserById(String userId) => _remoteSource.getUser(userId);
-
-  @override
-  Future<List<Group>> getGroupsByUserId(String userId) =>
-      _remoteSource.getGroups(userId);
 
   @override
   Future<void> updateUsername(String newUsername) async {

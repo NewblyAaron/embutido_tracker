@@ -1,7 +1,9 @@
+import 'package:embutido_tracker/domain/entity/position.dart';
 import 'package:embutido_tracker/domain/entity/user_location.dart';
 
-abstract class UserLocationService {
+abstract class UserLocationRemoteSource {
   Stream<Map<String, UserLocation>> get userLocations;
 
-  void setGroupChannel(String groupId);
+  Future<void> setGroup(String groupId);
+  Future<void> updateUserLocation(String userId, Position newPosition);
 }

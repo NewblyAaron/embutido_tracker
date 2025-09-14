@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:embutido_tracker/core/logging/logger_access.dart';
 import 'package:embutido_tracker/domain/entity/position.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
@@ -15,7 +16,10 @@ class SupabaseLocationQuery {
   SupabaseLocationQuery(this._client);
 
   Stream<Map<String, Position>> get dataStream {
-    if (_groupId == null) throw Exception("Group ID is null");
+    if (_groupId == null) {
+      LoggerAccess.logger.warn("No group ID set");
+      return Stream.value({});
+    }
 
     return _userLocationStream.stream;
   }
@@ -27,29 +31,61 @@ class SupabaseLocationQuery {
   }
 
   void _setupChannel() {
+    _userPositions.clear();
+
+    _channel?.untrack();
     _channel?.unsubscribe();
+
     _channel = _client
-        .channel(_groupId!)
-        .onBroadcast(
-          event: 'location',
-          callback: (payload) => _locationReceived(payload),
-        );
+        .channel(_groupId!, opts: supabase.RealtimeChannelConfig(private: true))
+        .onPresenceSync((_) {
+          final presenceStates = _channel!.presenceState();
+          final presences =
+              presenceStates.map((e) => e.presences.first).toList();
+          final payloads = presences.map((e) => e.payload).toList();
+
+          LoggerAccess.logger.debug(presenceStates.toString());
+          LoggerAccess.logger.debug(presences.toString());
+          LoggerAccess.logger.debug(payloads.toString());
+
+          for (final payload in payloads) {
+            final userId = payload['user_id'] as String;
+            final position = Position(
+              payload['latitude'] as double,
+              payload['longitude'] as double,
+              DateTime.parse(payload['timestamp'] as String),
+            );
+
+            _userPositions[userId] = position;
+          }
+
+          _userLocationStream.add(_userPositions);
+        })
+        .onPresenceJoin((payload) {
+          final userId = payload.newPresences.first.payload['user_id'];
+
+          LoggerAccess.logger.debug("$userId has joined");
+        })
+        .onPresenceLeave((payload) {
+          final userId = payload.leftPresences.first.payload['user_id'];
+          _userPositions.remove(userId);
+          _userLocationStream.add(_userPositions);
+
+          LoggerAccess.logger.debug("$userId has left");
+        });
+
     _channel!.subscribe();
   }
 
-  void _locationReceived(Map<String, dynamic> payload) async {
-    final userId = payload['user_id'] as String;
-    final position = Position(
-      payload['latitude'] as double,
-      payload['longitude'] as double,
-    );
-
-    _userPositions[userId] = position;
-
-    _userLocationStream.add(Map.from(_userPositions));
-  }
+  void updateLocation(String userId, Position newPosition) => _channel?.track({
+    'user_id': userId,
+    'latitude': newPosition.latitude,
+    'longitude': newPosition.longitude,
+    'timestamp': newPosition.timestamp.toIso8601String(),
+  });
 
   void dispose() {
+    _userPositions.clear();
     _channel?.unsubscribe();
     _userLocationStream.close();
   }

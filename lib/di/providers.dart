@@ -1,6 +1,7 @@
 import 'package:embutido_tracker/core/services/image_service.dart';
 import 'package:embutido_tracker/core/services/logger_service.dart';
 import 'package:embutido_tracker/data/repositories/supabase_group_repository.dart';
+import 'package:embutido_tracker/data/repositories/supabase_location_repository.dart';
 import 'package:embutido_tracker/data/repositories/supabase_user_repository.dart';
 import 'package:embutido_tracker/data/sources/local/geolocator_gps_service.dart';
 import 'package:embutido_tracker/data/sources/local/permission_handler_service.dart';
@@ -8,9 +9,10 @@ import 'package:embutido_tracker/data/sources/remote/supabase_auth_service.dart'
 import 'package:embutido_tracker/data/sources/remote/supabase_avatar_service.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_group_source.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_storage_source.dart';
-import 'package:embutido_tracker/data/sources/remote/supabase_user_location_service.dart';
+import 'package:embutido_tracker/data/sources/remote/supabase_user_location_source.dart';
 import 'package:embutido_tracker/data/sources/remote/supabase_user_source.dart';
 import 'package:embutido_tracker/domain/repositories/group_repository.dart';
+import 'package:embutido_tracker/domain/repositories/location_repository.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
 import 'package:embutido_tracker/domain/services/avatar_cache_service.dart';
 import 'package:embutido_tracker/domain/services/auth_service.dart';
@@ -76,14 +78,14 @@ final userProviders = [
       if (repository is SupabaseUserRepository) repository.dispose();
     },
   ),
-  Provider<UserLocationService>(
+  Provider<UserLocationRemoteSource>(
     create:
-        (context) => SupabaseUserLocationService(
+        (context) => SupabaseUserLocationSource(
           context.read<SupabaseClient>(),
           context.read<UserRemoteSource>(),
         ),
     dispose: (context, service) {
-      if (service is SupabaseUserLocationService) service.dispose();
+      if (service is SupabaseUserLocationSource) service.dispose();
     },
   ),
 ];
@@ -100,8 +102,23 @@ final groupProviders = [
   ),
 ];
 
-final gpsProviders = [
+final locationProviders = [
   Provider<GPSService>(create: (context) => GeolocatorService()),
+  Provider<UserLocationRemoteSource>(
+    create:
+        (context) => SupabaseUserLocationSource(
+          context.read<SupabaseClient>(),
+          context.read<UserRemoteSource>(),
+        ),
+  ),
+  Provider<LocationRepository>(
+    create:
+        (context) => SupabaseLocationRepository(
+          context.read<UserRepository>(),
+          context.read<GPSService>(),
+          context.read<UserLocationRemoteSource>(),
+        ),
+  ),
 ];
 
 final globalProviders = [
@@ -111,5 +128,5 @@ final globalProviders = [
   ...authProviders,
   ...userProviders,
   ...groupProviders,
-  ...gpsProviders,
+  ...locationProviders,
 ];

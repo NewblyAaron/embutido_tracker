@@ -1,5 +1,6 @@
 import 'package:embutido_tracker/domain/entity/group.dart';
 import 'package:embutido_tracker/ui/home/map/map_group_create_dialog.dart';
+import 'package:embutido_tracker/ui/home/map/map_group_join_dialog.dart';
 import 'package:embutido_tracker/ui/home/map/map_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class MapGroupSelectModal extends StatelessWidget {
                 builder:
                     (context) => ChangeNotifierProvider.value(
                       value: viewModel,
-                      builder: (_, _) => CreateGroupDialog(),
+                      builder: (_, _) => CreateForm(),
                     ),
               );
 
@@ -42,7 +43,7 @@ class MapGroupSelectModal extends StatelessWidget {
                 builder:
                     (context) => ChangeNotifierProvider.value(
                       value: viewModel,
-                      builder: (_, _) => CreateGroupDialog(),
+                      builder: (_, _) => JoinForm(),
                     ),
               );
 

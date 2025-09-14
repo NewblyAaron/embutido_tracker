@@ -2,11 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:embutido_tracker/domain/entity/user.dart';
 import 'package:flutter/material.dart';
 
-class PinMarker extends StatelessWidget {
+class UserPinMarker extends StatelessWidget {
   final User _user;
   final Function()? onTap;
 
-  const PinMarker({super.key, required User user, this.onTap}) : _user = user;
+  const UserPinMarker({super.key, required User user, this.onTap})
+    : _user = user;
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,14 @@
 import 'package:embutido_tracker/core/utils/validations.dart';
 import 'package:flutter/material.dart';
 
-class CreateGroupDialog extends StatefulWidget {
-  const CreateGroupDialog({super.key});
+class CreateForm extends StatefulWidget {
+  const CreateForm({super.key});
 
   @override
-  State<CreateGroupDialog> createState() => _CreateGroupDialogState();
+  State<CreateForm> createState() => _CreateFormState();
 }
 
-class _CreateGroupDialogState extends State<CreateGroupDialog> {
+class _CreateFormState extends State<CreateForm> {
   final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 

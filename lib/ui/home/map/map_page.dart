@@ -1,20 +1,20 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:embutido_tracker/domain/entity/position.dart';
-import 'package:embutido_tracker/domain/entity/user.dart';
+import 'package:embutido_tracker/domain/entity/user_location.dart';
 import 'package:embutido_tracker/domain/repositories/group_repository.dart';
+import 'package:embutido_tracker/domain/repositories/location_repository.dart';
 import 'package:embutido_tracker/domain/repositories/user_repository.dart';
-import 'package:embutido_tracker/domain/services/gps_service.dart';
 import 'package:embutido_tracker/domain/services/permission_service.dart';
-import 'package:embutido_tracker/domain/services/user_location_service.dart';
 import 'package:embutido_tracker/ui/home/map/map_group_select_modal.dart';
-import 'package:embutido_tracker/ui/home/map/map_pin_marker.dart';
+import 'package:embutido_tracker/ui/home/map/map_user_cluster_pin_marker.dart';
+import 'package:embutido_tracker/ui/home/map/map_user_pin_marker.dart';
 import 'package:embutido_tracker/ui/home/map/map_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_compass/flutter_map_compass.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -28,9 +28,8 @@ class MapPage extends StatelessWidget {
           (context) => MapViewModel(
             context.read<UserRepository>(),
             context.read<GroupRepository>(),
-            context.read<GPSService>(),
+            context.read<LocationRepository>(),
             context.read<PermissionService>(),
-            context.read<UserLocationService>(),
           ),
       builder: (context, child) => _MapPageBody(),
     );
@@ -67,7 +66,7 @@ class _MapPageBodyState extends State<_MapPageBody>
       await _viewModel.initialize();
 
       // move and zoom camera to where user is on first load
-      final position = await _viewModel.currentLocationStream.first;
+      final position = await _viewModel.currentPositionStream.first;
       _mapController.animateTo(
         dest: LatLng(position.latitude, position.longitude),
         curve: Curves.ease,
@@ -109,7 +108,7 @@ class _MapPageBodyState extends State<_MapPageBody>
             ),
           ),
 
-          _buildCurrentUserMarker(),
+          _buildMarkers(),
           _buildGroupSelectButton(),
           _buildGroupMembersListButton(),
 
@@ -131,7 +130,7 @@ class _MapPageBodyState extends State<_MapPageBody>
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.only(left: 8),
       child: StreamBuilder(
-        stream: _viewModel.usersPositionStream,
+        stream: _viewModel.userLocationsStream,
         builder: (context, snapshot) {
           if (snapshot.data == null || snapshot.data!.isEmpty == true) {
             return Container(); // nothing
@@ -221,34 +220,48 @@ class _MapPageBodyState extends State<_MapPageBody>
     );
   }
 
-  StreamBuilder<Position> _buildCurrentUserMarker() {
-    return StreamBuilder<Position>(
-      stream: context.watch<MapViewModel>().currentLocationStream,
+  StreamBuilder _buildMarkers() {
+    return StreamBuilder<Map<String, UserLocation>>(
+      stream: context.watch<MapViewModel>().userLocationsStream,
       builder: (context, snapshot) {
-        final position = snapshot.data;
-        if (position == null) return const SizedBox();
+        final data = snapshot.data;
+        if (data == null) return const SizedBox();
 
-        final latLngPos = LatLng(position.latitude, position.longitude);
-
-        return MarkerLayer(
-          markers: [
-            Marker(
-              width: 70,
-              height: 80,
-              point: latLngPos,
-              rotate: true,
-              alignment: Alignment.topCenter,
-              child: PinMarker(
-                user: context.watch<User>(),
-                onTap:
-                    () => _mapController.animateTo(
-                      dest: latLngPos,
-                      curve: Curves.ease,
-                      zoom: 17,
-                    ),
-              ),
-            ),
-          ],
+        return MarkerClusterLayerWidget(
+          options: MarkerClusterLayerOptions(
+            maxClusterRadius: 45,
+            size: Size(90, 100),
+            alignment: Alignment.topCenter,
+            markers: [
+              for (final entry in data.entries)
+                Marker(
+                  key: ValueKey(entry.value.user),
+                  width: 70,
+                  height: 80,
+                  point: LatLng(
+                    entry.value.position.latitude,
+                    entry.value.position.longitude,
+                  ),
+                  rotate: true,
+                  alignment: Alignment.topCenter,
+                  child: UserPinMarker(
+                    user: entry.value.user,
+                    onTap:
+                        () => _mapController.animateTo(
+                          dest: LatLng(
+                            entry.value.position.latitude,
+                            entry.value.position.longitude,
+                          ),
+                          curve: Curves.ease,
+                          zoom: 17,
+                        ),
+                  ),
+                ),
+            ],
+            builder: (context, markers) {
+              return UserClusterPinMarker(markers: markers);
+            },
+          ),
         );
       },
     );
